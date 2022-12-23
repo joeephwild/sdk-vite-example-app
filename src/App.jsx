@@ -11,7 +11,7 @@ import PeerVideoAudioElem from "./components/PeerVideoAudioElem";
 import MeVideoElem from "./components/MeVideoElem";
 
 function App() {
-  const huddleClient = getHuddleClient("YOUR_API_KEY");
+  const huddleClient = getHuddleClient("e5f348aa5626aaa775a09e9515f224933d25b7c40792bbf886a5e74c83827720");
   const peersKeys = useHuddleStore((state) => Object.keys(state.peers));
   const lobbyPeers = useHuddleStore((state) => state.lobbyPeers);
   const roomState = useHuddleStore((state) => state.roomState);

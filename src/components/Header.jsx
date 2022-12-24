@@ -2,10 +2,10 @@ import React from "react";
 import { logo } from "../assets";
 import { CustomButton } from "../components";
 
-const address = ''
+const address = '0x013166D598AB78A8ddf8C1bF34Ff9bC7C50D36D2'
 const Header = () => {
   return (
-    <nav className="flex items-center px-4 bg-black justify-between w-full top-0 fixed gap-6">
+    <nav className="flex items-center px-4 bg-transparent justify-between w-full top-0 fixed gap-6">
       <div className="flex items-center">
         <img src={logo} alt="logo" className="w-20 h-20 pb-2 object-contain" />
       </div>

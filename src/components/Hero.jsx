@@ -4,14 +4,15 @@ import { HeroText } from "../components";
 
 const Hero = () => {
   return (
-    <div className="mt-24 mx-6">
-      <div className="grid md:grid-cols-2 space-x-6 items-center">
+    <div className="">
+      <div className="grid md:grid-cols-2 space-x-6 gap-3 items-center">
         <HeroText />
         <img
           src={service}
           alt="service"
-          className="lg:h-[500px] md:[400px] w-full  object-cover "
+          className=" h-full md:[400px] w-full px-8 py-24  lg:bg-white   object-cover "
         />
+
       </div>
     </div>
   );

@@ -5,7 +5,14 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "Panchang-Extrabold": ["Panchang-Extrabold"],
+        "Panchang-Light": [" Panchang-Light"],
+        "Panchang-Medium": ["Panchang-Medium"],
+        "HankenGrotesk-Bold": ["HankenGrotesk-Bold",]
+      }
+    },
   },
   plugins: [],
 }

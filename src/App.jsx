@@ -1,15 +1,11 @@
-import reactLogo from "./assets/react.svg";
-import "./App.css";
-import HuddleClient from "./components/HuddleClient";
-import { Header, Hero } from "./components";
+import { Header, Hero, Partner } from "./components";
 
 function App() {
-  
-
   return (
     <div>
      <Header />
      <Hero />
+     <Partner />
     </div>
   );
 }

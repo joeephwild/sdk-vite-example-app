@@ -3,7 +3,7 @@ import { partner1, partner2, partner3 } from "../assets";
 
 const Partner = () => {
   return (
-    <div className="w-full my-6 flex-col items-center ">
+    <div className="w-full my-3 flex-col items-center ">
       <h3 className="text-sm font-bold font-HankenGrotesk-Bold mb-6 text-center">
         These companies work with us to make us grow.
       </h3>

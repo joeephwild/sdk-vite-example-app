@@ -12,55 +12,27 @@ pragma solidity ^0.8.9;
  */
 
 contract EthJobs {
-    struct Jobs {
-        string CompanyName;
-        string Category;
-        uint256 salary;
-        uint256 timeStamp;
-        address owner;
-        string description;
-        string skills;
-        string location;
-        string jobType;
-        bool isJobVacant;
-    }
 
-    struct Candidate {
-        string name;
-        string skills;
-        address owner;
-        uint256 experience;
-        uint256 salaryExpectation;
-        string description;
-        string profileImage;
-        string githubLink;
-        string linkedin;
-    }
+   struct Jobs {
+    string CompanyName;
+    string Category;
+    uint256 salary;
+    uint256 timeStamp;
+    address owner;
+    string description;
+    string skills;
+    string location;
+    string jobType;
+    bool isJobVacant;
+   }
 
-    uint256 listingPrice = 0.05 ether;
-
-    modifier onlyOwner{
-     // require(msg.sender == Jobs.owner, "");
-      _;
-    }
-
-    event job(address owner, address company, string message );
-
-    function updateListingPrice() public {}
-
-    function createAnAccount() public {}
-
-    function updateAnAccount() public {}
-
-    function listAJob() public {}
-
-    function getAllJob() public view returns(Jobs[] memory) {}
-
-    function getUserAccountDetails() public view {}
-
-    function getAllAccount() public view returns(Candidate[] memory) {}
-
-    function getAllJobPosting() public {}
-
-    function applyForJobs() public {}
+   struct Candidate {
+    string name;
+    string skills;
+    uint experience;
+    uint256 salaryExpectation;
+    string description;
+    string profileImage;
+    string githubLink;
+   }
 }

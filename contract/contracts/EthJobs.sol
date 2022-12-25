@@ -28,6 +28,7 @@ contract EthJobs {
     struct Candidate {
         string name;
         string skills;
+        address owner;
         uint256 experience;
         uint256 salaryExpectation;
         string description;
@@ -37,6 +38,11 @@ contract EthJobs {
     }
 
     uint256 listingPrice = 0.05 ether;
+
+    modifier onlyOwner{
+     // require(msg.sender == Jobs.owner, "");
+      _;
+    }
 
     event job(address owner, address company, string message );
 
@@ -48,9 +54,11 @@ contract EthJobs {
 
     function listAJob() public {}
 
-    function getAllAccount() public view {}
+    function getAllJob() public view returns(Jobs[] memory) {}
 
-    function getUserAccount() public view {}
+    function getUserAccountDetails() public view {}
+
+    function getAllAccount() public view returns(Candidate[] memory) {}
 
     function getAllJobPosting() public {}
 

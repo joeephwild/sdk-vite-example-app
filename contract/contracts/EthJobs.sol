@@ -33,9 +33,14 @@ contract EthJobs {
         string description;
         string profileImage;
         string githubLink;
+        string linkedin;
     }
 
+    uint256 listingPrice = 0.05 ether;
+
     event job(address owner, address company, string message );
+
+    function updateListingPrice() public {}
 
     function createAnAccount() public {}
 
@@ -43,7 +48,9 @@ contract EthJobs {
 
     function listAJob() public {}
 
-    function getAllAccount() public {}
+    function getAllAccount() public view {}
+
+    function getUserAccount() public view {}
 
     function getAllJobPosting() public {}
 

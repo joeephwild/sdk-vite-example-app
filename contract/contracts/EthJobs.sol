@@ -38,7 +38,7 @@ contract EthJobs {
    }
 
 mapping (address => Candidate) profile;
-mapping (address => Jobs) companyProfile;
+mapping (address => employer) companyProfile;
 mapping (string => Jobs) company;
 address[] listCandidates;
 address[] listEmployers;
@@ -124,7 +124,7 @@ string [] listJobs;
     } 
 //update or edit the user details
 // if there is nothing to input in _dataInteger then enter 0
-    function updateEmployerAccount(uint256 option, string memory _data, uint256 _dataInteger) public onlyOwner  returns (Jobs memory) {
+    function updateEmployerAccount(uint256 option, string memory _data, uint256 _dataInteger) public onlyOwner  returns (employer memory) {
            require(msg.sender ==  companyProfile[msg.sender].owner, "Only owner is allowed to change details");
            if(option == 0){
                  companyProfile[msg.sender].CompanyName = _data;

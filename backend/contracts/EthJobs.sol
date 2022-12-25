@@ -65,22 +65,23 @@ contract EthJobs {
     // create the user account details
     function createAnAccount(
         string memory _name,
+        address _owner,
         string memory _skills,
         uint256 _experience,
         uint256 _salaryExpectation,
         string memory _description,
         string memory _profileImage,
         string memory _githubLink
-    ) public returns (bool) {
-        profile[msg.sender].name = _name;
-        profile[msg.sender].ownerUser = msg.sender;
-        profile[msg.sender].skills = _skills;
-        profile[msg.sender].experience = _experience;
-        profile[msg.sender].salaryExpectation = _salaryExpectation;
-        profile[msg.sender].description = _description;
-        profile[msg.sender].profileImage = _profileImage;
-        profile[msg.sender].githubLink = _githubLink;
-        return true;
+    ) public  {
+        Candidate storage accounts = profile[_owner];
+        accounts.name = _name;
+        accounts.ownerUser = msg.sender;
+        accounts.skills = _skills;
+        accounts.experience = _experience;
+        accounts.salaryExpectation = _salaryExpectation;
+        accounts.description = _description;
+        accounts.profileImage = _profileImage;
+        accounts.githubLink = _githubLink;
     }
 
     //update or edit the user details

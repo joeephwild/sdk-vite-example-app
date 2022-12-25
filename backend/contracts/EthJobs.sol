@@ -38,6 +38,7 @@ contract EthJobs {
 
     uint256 public jobCounter; //stores the number of jobs in the dapp
     uint256 public employerCounter;
+    uint256 accountCounter;
     mapping(address => Candidate) public profile;
     mapping(address => employer) public companyProfile;
     mapping(uint256 => Jobs) public company;
@@ -72,7 +73,7 @@ contract EthJobs {
         string memory _description,
         string memory _profileImage,
         string memory _githubLink
-    ) public  {
+    ) public returns(uint256) {
         Candidate storage accounts = profile[_owner];
         accounts.name = _name;
         accounts.ownerUser = msg.sender;
@@ -82,6 +83,9 @@ contract EthJobs {
         accounts.description = _description;
         accounts.profileImage = _profileImage;
         accounts.githubLink = _githubLink;
+        accountCounter++;
+        listCandidates.push(accounts);
+        return accountCounter;
     }
 
     //update or edit the user details

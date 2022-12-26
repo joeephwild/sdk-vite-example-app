@@ -14,6 +14,7 @@ contract EthJobs {
         string location;
         string jobType;
         bool isJobVacant;
+    address [] applicants;
     }
 
     struct employer {
@@ -35,13 +36,29 @@ contract EthJobs {
         string profileImage;
         string githubLink;
     }
+//applicants
+    struct applyJob {
+        string name;
+        address candidateAddress;
+        string coverLetter;
+        string resume;
+        string portfolioLink;
+        }
+
+    // administrator address
+    address administrator = msg.sender;
 
     uint256 public jobCounter; //stores the number of jobs in the dapp
     uint256 public employerCounter;
     uint256 accountCounter;
+    //candidate profile
     mapping(address => Candidate) public profile;
+    //company profile
     mapping(address => employer) public companyProfile;
+    //companies
     mapping(uint256 => Jobs) public company;
+    //applicants
+    mapping(address => applyJob) public listApplicant;
     //array of type candidate struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
     Candidate[] listCandidates;
     //array of type employer struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
@@ -49,7 +66,7 @@ contract EthJobs {
     //array of type Jobs struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
     Jobs[] listJobs;
     uint256 listingPrice = 0.05 ether;
-
+// only company owner can access
     modifier onlyOwner() {
         require(
             msg.sender == companyProfile[msg.sender].owner,
@@ -58,10 +75,23 @@ contract EthJobs {
 
         _;
     }
+// only administrator can access
+     modifier onlyAdministrator() {
+        require(
+            msg.sender == administrator,
+            "Only owner is allowed to change details"
+        );
+
+        _;
+    }
 
     event job(address owner, address company, string message);
 
-    function updateListingPrice() public {}
+//to update the price
+    function updateListingPrice(uint256 _newPrice) public onlyAdministrator returns(string memory) {
+        listingPrice = _newPrice;
+        return "price updated to new";
+    }
 
     // create the user account details
     function createAnAccount(
@@ -74,6 +104,8 @@ contract EthJobs {
         string memory _profileImage,
         string memory _githubLink
     ) public returns(uint256) {
+                require(msg.sender != administrator, "Administrator not allowed");
+
         Candidate storage accounts = profile[_owner];
         accounts.name = _name;
         accounts.ownerUser = msg.sender;
@@ -95,6 +127,8 @@ contract EthJobs {
         string memory _data,
         uint256 _dataInteger
     ) public returns (Candidate memory) {
+                require(msg.sender != administrator, "Administrator not allowed");
+
         require(
             msg.sender == profile[msg.sender].ownerUser,
             "Only owner is allowed to change details"
@@ -126,6 +160,7 @@ contract EthJobs {
         string memory _location
     ) public {
         //create a new variable to store every data
+        require(msg.sender != administrator, "Administrator not allowed");
         employer storage Profile = companyProfile[_owner];
         Profile.CompanyName = _CompanyName;
         Profile.owner = msg.sender;
@@ -143,6 +178,9 @@ contract EthJobs {
         string memory _data,
         uint256 _dataInteger
     ) public onlyOwner returns (employer memory) {
+        
+        require(msg.sender != administrator, "Administrator not allowed");
+
         require(
             msg.sender == companyProfile[msg.sender].owner,
             "Only owner is allowed to change details"
@@ -172,11 +210,13 @@ contract EthJobs {
         string memory _skills,
         string memory _location,
         string memory _jobType
-    ) public returns (uint256) {
+    ) public payable returns (uint256) {
         require(
             msg.sender == companyProfile[msg.sender].owner,
             "Only owner is allowed to change details"
         );
+        require(msg.value >= listingPrice,"ether sent is smaller than required");
+
          //create a new variable to store every data
         Jobs storage post = company[_id];
         post.CompanyName = _CompanyName;
@@ -202,13 +242,39 @@ contract EthJobs {
     function getAllEmployers() public view returns(employer[] memory) {
         return listEmployers;
     } // get the user details or candidate details
-   
-   
+
     function getAllAccount() public view returns (Candidate[] memory) {
         return listCandidates;
     } // all user profiles
 
-    function getAllJobPosting() public {} // list of jobs as per users choice
+// list of jobs as per users choice
+    function getAllJobPosting() public {
+        //do it in frontend
+    } 
+    // apply to any job.
+    function applyForJobs(
+        uint256 _jobId,
+        string memory _name, 
+        string memory _coverLetter,
+        string memory _resume,
+        string memory _portfolioLink) public {
+         Jobs storage post = company[_jobId];
+         post.applicants.push(msg.sender);
+         applyJob storage applyIt = listApplicant[msg.sender];
+         applyIt.name = _name;
+         applyIt.coverLetter = _coverLetter;
+         applyIt.resume = _resume;
+         applyIt.portfolioLink = _portfolioLink;
+         applyIt.candidateAddress = msg.sender;
+        
 
-    function applyForJobs() public {} // apply to any job.
+
+    } 
+// to withdraw ether in contract to the administrator account
+    function withdraw() public {}
+
+
+    receive() external payable {}
+
+    fallback() external payable{}
 }

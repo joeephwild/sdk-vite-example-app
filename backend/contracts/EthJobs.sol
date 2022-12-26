@@ -202,7 +202,8 @@ contract EthJobs {
     function getAllEmployers() public view returns(employer[] memory) {
         return listEmployers;
     } // get the user details or candidate details
-
+   
+   
     function getAllAccount() public view returns (Candidate[] memory) {
         return listCandidates;
     } // all user profiles

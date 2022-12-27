@@ -4,20 +4,23 @@ pragma solidity ^0.8.9;
 contract EthJobs {
     struct Jobs {
         string CompanyName;
+        string companyImage;
         uint256 id; //id is a number so it supposed to be uint type
         string Category;
         uint256 salary;
         uint256 timeStamp;
+        uint256 noAppllicant;
         address owner;
         string description;
         string skills;
         string location;
         string jobType;
         bool isJobVacant;
-    address [] applicants;
+        address[] applicants;
     }
 
     struct employer {
+        string companyImage;
         string CompanyName;
         string Category;
         address owner;
@@ -36,21 +39,26 @@ contract EthJobs {
         string profileImage;
         string githubLink;
     }
-//applicants
+    //applicants
     struct applyJob {
         string name;
         address candidateAddress;
         string coverLetter;
         string resume;
         string portfolioLink;
-        }
+    }
 
     // administrator address
-    address administrator = msg.sender;
+    address public administrator;
+
+    constructor() {
+        administrator = payable(0x013166D598AB78A8ddf8C1bF34Ff9bC7C50D36D2);
+    }
 
     uint256 public jobCounter; //stores the number of jobs in the dapp
-    uint256 public employerCounter;
-    uint256 accountCounter;
+    uint256 public employerCounter;//stores the number of employers on the block
+    uint256 public accountCounter; //stores number of account woners in the block
+    uint256 public applicant; //stores number of applicat for a particular job posting
     //candidate profile
     mapping(address => Candidate) public profile;
     //company profile
@@ -59,14 +67,17 @@ contract EthJobs {
     mapping(uint256 => Jobs) public company;
     //applicants
     mapping(address => applyJob) public listApplicant;
+    mapping(address => mapping(uint256 => Jobs)) public jmap;
     //array of type candidate struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
     Candidate[] listCandidates;
     //array of type employer struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
     employer[] listEmployers;
     //array of type Jobs struct to store every candidate in the dapp like [{name, skills etc},{name, skills etc},{name, skills etc}] and so on
     Jobs[] listJobs;
-    uint256 listingPrice = 0.05 ether;
-// only company owner can access
+
+    applyJob[] applicants;
+    uint256 listingPrice;
+    // only company owner can access
     modifier onlyOwner() {
         require(
             msg.sender == companyProfile[msg.sender].owner,
@@ -75,8 +86,8 @@ contract EthJobs {
 
         _;
     }
-// only administrator can access
-     modifier onlyAdministrator() {
+    // only administrator can access
+    modifier onlyAdministrator() {
         require(
             msg.sender == administrator,
             "Only owner is allowed to change details"
@@ -87,8 +98,12 @@ contract EthJobs {
 
     event job(address owner, address company, string message);
 
-//to update the price
-    function updateListingPrice(uint256 _newPrice) public onlyAdministrator returns(string memory) {
+    //to update the price
+    function updateListingPrice(uint256 _newPrice)
+        public
+        onlyAdministrator
+        returns (string memory)
+    {
         listingPrice = _newPrice;
         return "price updated to new";
     }
@@ -103,8 +118,8 @@ contract EthJobs {
         string memory _description,
         string memory _profileImage,
         string memory _githubLink
-    ) public returns(uint256) {
-                require(msg.sender != administrator, "Administrator not allowed");
+    ) public returns (uint256) {
+        require(msg.sender != administrator, "Administrator not allowed");
 
         Candidate storage accounts = profile[_owner];
         accounts.name = _name;
@@ -127,8 +142,11 @@ contract EthJobs {
         string memory _data,
         uint256 _dataInteger
     ) public returns (Candidate memory) {
-                require(msg.sender != administrator, "Administrator not allowed");
-
+        require(msg.sender != administrator, "Administrator not allowed");
+          require(
+            msg.sender != companyProfile[msg.sender].owner,
+            "Only owner is allowed to change details"
+        );
         require(
             msg.sender == profile[msg.sender].ownerUser,
             "Only owner is allowed to change details"
@@ -173,12 +191,11 @@ contract EthJobs {
 
     //update or edit the user details
     // if there is nothing to input in _dataInteger then enter 0
-    function updateEmployerAccount(
-        uint256 option,
-        string memory _data,
-        uint256 _dataInteger
-    ) public onlyOwner returns (employer memory) {
-        
+    function updateEmployerAccount(uint256 option, string memory _data)
+        public
+        onlyOwner
+        returns (employer memory)
+    {
         require(msg.sender != administrator, "Administrator not allowed");
 
         require(
@@ -204,31 +221,39 @@ contract EthJobs {
     function listAJob(
         uint256 _id,
         string memory _CompanyName,
+        string memory _companyImage,
         string memory _Category,
         uint256 _salary,
         string memory _description,
         string memory _skills,
         string memory _location,
-        string memory _jobType
+        string memory _jobType,
+        uint256 _price
     ) public payable returns (uint256) {
         require(
             msg.sender == companyProfile[msg.sender].owner,
             "Only owner is allowed to change details"
         );
-        require(msg.value >= listingPrice,"ether sent is smaller than required");
-
-         //create a new variable to store every data
+        require(
+            msg.value == listingPrice,
+            "pls send the asking price in order"
+        );
+        listingPrice = _price;
+        //create a new variable to store every data
         Jobs storage post = company[_id];
         post.CompanyName = _CompanyName;
+        post.companyImage = _companyImage;
         post.Category = _Category;
         post.salary = _salary;
         post.timeStamp = block.timestamp;
+        post.noAppllicant = applicant;
         post.description = _description;
         post.skills = _skills;
         post.location = _location;
         post.jobType = _jobType;
-        post.isJobVacant = false;
-        //pushing the newly created job variable to the array 
+        post.isJobVacant = true;
+        payable(administrator).transfer(listingPrice);
+        //pushing the newly created job variable to the array
         listJobs.push(post);
         jobCounter++;
         return jobCounter;
@@ -239,7 +264,15 @@ contract EthJobs {
         return listJobs;
     }
 
-    function getAllEmployers() public view returns(employer[] memory) {
+    function setJobToClosed(uint256 _id) public onlyOwner {
+         require(
+            msg.sender == companyProfile[msg.sender].owner,
+            "Only owner is allowed to change details"
+        );
+        company[_id].isJobVacant = false;
+    }
+
+    function getAllEmployers() public view returns (employer[] memory) {
         return listEmployers;
     } // get the user details or candidate details
 
@@ -247,34 +280,37 @@ contract EthJobs {
         return listCandidates;
     } // all user profiles
 
-// list of jobs as per users choice
-    function getAllJobPosting() public {
-        //do it in frontend
-    } 
     // apply to any job.
     function applyForJobs(
         uint256 _jobId,
-        string memory _name, 
+        string memory _name,
         string memory _coverLetter,
         string memory _resume,
-        string memory _portfolioLink) public {
-         Jobs storage post = company[_jobId];
-         post.applicants.push(msg.sender);
-         applyJob storage applyIt = listApplicant[msg.sender];
-         applyIt.name = _name;
-         applyIt.coverLetter = _coverLetter;
-         applyIt.resume = _resume;
-         applyIt.portfolioLink = _portfolioLink;
-         applyIt.candidateAddress = msg.sender;
-        
+        string memory _portfolioLink,
+        address _owner
+    ) public returns (uint256) {
+        Jobs storage post = company[_jobId];
+        post.applicants.push(msg.sender);
+        applyJob storage applyIt = listApplicant[_owner];
+        applyIt.name = _name;
+        applyIt.coverLetter = _coverLetter;
+        applyIt.resume = _resume;
+        applyIt.portfolioLink = _portfolioLink;
+        applyIt.candidateAddress = msg.sender;
+        applicant++;
+        applicants.push(applyIt);
+        return applicant;
+    }
 
+    function getAllApplicant() public view returns(applyJob[] memory) {
+        return applicants;
+    }
 
-    } 
-// to withdraw ether in contract to the administrator account
-    function withdraw() public {}
-
-
-    receive() external payable {}
-
-    fallback() external payable{}
+    function getApplicants(uint256 _id)
+        public
+        view
+        returns (address[] memory)
+    {
+        return (company[_id].applicants);
+    }
 }
